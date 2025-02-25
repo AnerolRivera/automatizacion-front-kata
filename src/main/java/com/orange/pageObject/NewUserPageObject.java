@@ -1,6 +1,7 @@
 package com.orange.pageObject;
 import net.serenitybdd.core.pages.PageObject;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -11,41 +12,69 @@ import java.time.Duration;
 public class NewUserPageObject extends PageObject {
 
 
-    private final By btnAdmin = By.xpath("//a[@href=\"/web/index.php/admin/viewAdminModule\"]");
+    // Elementos de la página
+    private final By btnAdmin = By.xpath("//a[@href='/web/index.php/admin/viewAdminModule']");
+    private final By btnAdd = By.xpath("//button[@class='oxd-button oxd-button--medium oxd-button--secondary']");
+    private final By btnStatus = By.xpath("//div[contains(@class, 'oxd-select-dropdown')]/div[contains(text(), '')]");
+    private final By lstStatus = By.xpath("(//div[contains(@class, 'oxd-select-text--active')])[2]");
+    private final By btnUserRole = By.xpath("(//div[contains(@class, 'oxd-select-text--active')])[1]");
+    private final By lstUserRole = By.xpath("//div[contains(@class, 'oxd-select-dropdown')]/div[contains(text(), 'Admin')]");
+    private final By txtEmployeName = By.xpath("(//div[@class='oxd-autocomplete-text-input oxd-autocomplete-text-input--active'])");
+    private final By txtUserName = By.xpath("(//input[@class='oxd-input oxd-input--active'])");
+    private final By txtPassword = By.xpath("(//input[@type='password'])[1]");
+    private final By txtPassword2 = By.xpath("(//input[@type='password'])[2]");
+    private final By btnSav = By.xpath("(//button[@class='oxd-button oxd-button--medium oxd-button--secondary orangehrm-left-space'])");
+
+    // Métodos para obtener los elementos
     public By getBtnAdmin() {
         return btnAdmin;
     }
-    private final By btnAdd = By.xpath("//button[@class=\"oxd-button oxd-button--medium oxd-button--secondary\"]");
-    public By getBtnAddn() {
-        return btnAdd;
-    }
-    private final By btnStatus = By.xpath("//div[contains(@class, 'oxd-select-dropdown')]/div[contains(text(), '')]");
-    private final By lstStatus = By.xpath("(//div[contains(@class, 'oxd-select-text--active')])[2]\n");
 
-    public By getLstStatus() {
-        return btnStatus;
+    public By getBtnAdd() {
+        return btnAdd;
     }
 
     public By getBtnStatus() {
         return btnStatus;
     }
 
-    private final By btnUserRole = By.xpath("(//div[contains(@class, 'oxd-select-text--active')])[1]");
-    private final By lstUserRole = By.xpath("//div[contains(@class, 'oxd-select-dropdown')]/div[contains(text(), 'Admin')]");
+    public By getLstStatus() {
+        return lstStatus;
+    }
 
-    // Método para obtener el botón del selector de rol
     public By getBtnUserRole() {
         return btnUserRole;
     }
 
-    // Método para obtener la opción específica del rol 'Admin'
     public By getLstUserRole() {
         return lstUserRole;
     }
 
-       public void selectUserRole(WebDriver driver) {
+    public By getTxtEmployeName() {
+        return txtEmployeName;
+    }
+
+    public By getTxtUserName() {
+        return txtUserName;
+    }
+
+    public By getTxtPassword() {
+        return txtPassword;
+    }
+
+    public By getTxtPassword2() {
+        return txtPassword2;
+    }
+
+    public By getBtnSav() {
+        return btnSav;
+    }
+
+    // Método para seleccionar el rol de usuario 'Admin'
+    public void selectUserRole(WebDriver driver) {
         // Hacer clic en el selector para abrir las opciones
         WebElement userRoleButton = driver.findElement(getBtnUserRole());
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", userRoleButton); // Desplazar al elemento
         userRoleButton.click();
 
         // Espera explícita para asegurarse de que el menú desplegable esté visible
@@ -54,31 +83,70 @@ public class NewUserPageObject extends PageObject {
 
         // Ahora seleccionamos la opción 'Admin'
         WebElement adminOption = driver.findElement(getLstUserRole());
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", adminOption); // Desplazar al elemento
         adminOption.click();
     }
 
-    private final By txtEmployeName = By.xpath("(//div[@class=\"oxd-autocomplete-text-input oxd-autocomplete-text-input--active\"])");
-    public By getTxtEmployeName() {
-        return txtEmployeName;
+    // Método para seleccionar el estado
+    public void selectStatus(WebDriver driver) {
+        WebElement statusButton = driver.findElement(getBtnStatus());
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", statusButton); // Desplazar al elemento
+        statusButton.click();
+
+        // Espera explícita para asegurarse de que el menú desplegable esté visible
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(getLstStatus())); // Espera que la opción del estado sea visible
+
+        // Seleccionar el estado
+        WebElement statusOption = driver.findElement(getLstStatus());
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", statusOption); // Desplazar al elemento
+        statusOption.click();
     }
 
-    private final By txtUserName = By.xpath("(//input[@class=\"oxd-input oxd-input--active\"])");
-    public By getTxtUserName() {
-        return txtUserName;
+    // Método para llenar el formulario de creación de usuario
+    public void fillUserForm(WebDriver driver, String employeeName, String username, String password) {
+        // Llenar los campos de formulario
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+        // Espera a que el campo de nombre de empleado esté visible y luego lo llena
+        WebElement empNameField = wait.until(ExpectedConditions.visibilityOfElementLocated(getTxtEmployeName()));
+        empNameField.sendKeys(employeeName);
+
+        // Espera a que el campo de nombre de usuario esté visible y luego lo llena
+        WebElement userNameField = wait.until(ExpectedConditions.visibilityOfElementLocated(getTxtUserName()));
+        userNameField.sendKeys(username);
+
+        // Espera a que el campo de contraseña esté visible y luego lo llena
+        WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(getTxtPassword()));
+        passwordField.sendKeys(password);
+
+        // Espera a que el campo de confirmación de contraseña esté visible y luego lo llena
+        WebElement confirmPasswordField = wait.until(ExpectedConditions.visibilityOfElementLocated(getTxtPassword2()));
+        confirmPasswordField.sendKeys(password);
     }
 
-    private final By txtPassword = By.xpath("(//input[@type=\"password\"])");
+    // Método para guardar el usuario
+    public void saveUser(WebDriver driver) {
+        WebElement saveButton = driver.findElement(getBtnSav());
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", saveButton); // Desplazar al elemento
+        saveButton.click();
+    }
 
-    public By getTxtPassword() {return txtPassword;}
+    // Método para agregar un nuevo usuario
+    public void addNewUser(WebDriver driver, String employeeName, String username, String password) {
+        // Hacer clic en el botón "Agregar"
+        WebElement addButton = driver.findElement(getBtnAdd());
+        addButton.click();
 
-    private final By txtPassword2 = By.xpath("(//input[@type=\"password\"])");
+        // Llenar el formulario de usuario
+        fillUserForm(driver, employeeName, username, password);
 
-    public By getTxtPassword2() {return txtPassword2;}
+        // Seleccionar el rol y el estado
+        selectUserRole(driver);
+        selectStatus(driver);
 
-    private final  By btnSav = By.xpath("(//button[@class=\"oxd-button oxd-button--medium oxd-button--secondary orangehrm-left-space\"])");
-
-    public By getBtnSav() {
-        return btnSav;
+        // Guardar el nuevo usuario
+        saveUser(driver);
     }
 
 }
