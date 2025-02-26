@@ -1,8 +1,8 @@
-Feature: Login con credenciales incompletas
-  @registroRequired
+Feature: Login con campo de usuario vacío
+  @registroInvalid1
 
-  Scenario: El usuario ingresa credenciales incompletas
+  Scenario: El usuario deja el campo de nombre de usuario vacío y coloca la contraseña
     Given El usuario ingresa en la página de login
-    When El usuario ingresa una contraseña incorrecta
-    And El usuario da clik el botón login
-    Then El sistema debe mostrar el campo Username en rojo y con el texto "Required"
+    When El usuario deja el campo de nombre de usuario vacío y coloca la contraseña
+    And El usuario selecciona el botón login
+    Then El sistema debe mostrar en el campo usuario el texto "Required"

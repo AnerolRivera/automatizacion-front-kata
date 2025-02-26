@@ -9,80 +9,74 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
+
+import static com.orange.utils.EsperaExplicita.esperarElemento;
+import static com.orange.utils.Scroll.scrollElemento;
+import static net.serenitybdd.core.Serenity.getDriver;
 
 
 public class NewUserStep {
 
- public String rutaExcel = "src/test/resources/data/Datos.xlsx";
- @Page
- private NewUserPageObject NewUser;
- private Excel excel;
 
- @Step("El usuario ingresa a la URL")
- public void openUrl() {
-  NewUser.openUrl("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+ private WebDriver driver;  // Campo para el WebDriver
+ public NewUserPageObject newUserPageObject;  // Página de Admin donde se gestionan los usuarios
+
+ // Método para establecer el WebDriver
+ public void setDriver(WebDriver driver) {
+  this.driver = driver;
+  this.newUserPageObject = new NewUserPageObject(driver);  // Se inicializa el Page Object con el WebDriver
  }
 
- @Step("El usuario selecciona la opción Admin")
- public void Admin() {
-  NewUser.getDriver().findElement(NewUser.getBtnAdmin()).click();
+ // Paso para navegar al formulario de Admin
+ @Step
+ public void navegarAlFormularioDeAdmin() {
+
+  // Espera hasta que un modal desaparezca si es necesario
+  new WebDriverWait(driver, Duration.ofSeconds(10))
+          .until(ExpectedConditions.invisibilityOfElementLocated(By.id("modalId")));  // Ajusta el id si hay un modal bloqueando
+
+  // Espera explícita para asegurarse de que el tab Admin sea visible y clickeable
+  new WebDriverWait(driver, Duration.ofSeconds(15))
+          .until(ExpectedConditions.visibilityOfElementLocated(newUserPageObject.getAdminTab()));
+
+  new WebDriverWait(driver, Duration.ofSeconds(15))
+          .until(ExpectedConditions.elementToBeClickable(newUserPageObject.getAdminTab()));  // Asegura que el tab Admin sea clickeable
+
+  // Clic en el tab Admin
+  driver.findElement(newUserPageObject.getAdminTab()).click();
  }
 
- @Step("El usuario selecciona el botón Add")
- public void Add() {
-  NewUser.getDriver().findElement(NewUser.getBtnAdd()).click();
+ // Paso para agregar un nuevo usuario
+ @Step
+ public void agregarNuevoUsuario(String nombre) {
+  // Espera explícita para asegurarse de que el botón 'Add' esté disponible antes de hacer clic
+  new WebDriverWait(driver, Duration.ofSeconds(10))
+          .until(ExpectedConditions.elementToBeClickable(newUserPageObject.getBtnAdd()));
+
+  // Clic en el botón 'Add' para agregar un nuevo usuario
+  driver.findElement(newUserPageObject.getBtnAdd()).click();
+
+  // Completa los campos para el nuevo usuario
+  newUserPageObject.agregarNuevoUsuario(nombre);
  }
 
- @Step("Diligenciar formulario de registro")
- public void formulario4() {
-  WebDriver driver = NewUser.getDriver();
+ // Verifica si el usuario está en la lista de usuarios
+ public boolean verificarUsuarioEnLista(String nombreUsuario) {
+  // Espera explícita para asegurarse de que la lista de usuarios esté visible
+  new WebDriverWait(driver, Duration.ofSeconds(10))
+          .until(ExpectedConditions.visibilityOfElementLocated(By.id("userList")));  // Ajusta el id si es necesario
 
-  // Paso 1: Hacer clic en el botón para abrir el menú desplegable de roles
-  WebElement userRoleButton = driver.findElement(NewUser.getBtnUserRole());
-  userRoleButton.click();
+  // Busca el nombre del usuario en la lista de usuarios
+  List<WebElement> usuarios = driver.findElements(By.xpath("//table//tr//td[contains(text(), '" + nombreUsuario + "')]"));
 
-  // Paso 2: Esperar explícitamente a que las opciones del menú se muestren
-  WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-  wait.until(ExpectedConditions.visibilityOfElementLocated(NewUser.getLstUserRole()));
-
-  // Paso 3: Hacer clic en la opción 'Admin'
-  WebElement adminOption = driver.findElement(NewUser.getLstUserRole());
-  adminOption.click();
-
-  // Paso 4: Rellenar los campos con los datos del Excel
-  String employeeName = Excel.leerDatosExcel(rutaExcel, "Hoja2", 1, 0);
-  String userName = Excel.leerDatosExcel(rutaExcel, "Hoja2", 1, 1);
-  String password = Excel.leerDatosExcel(rutaExcel, "Hoja2", 1, 2);
-  String confirmPassword = Excel.leerDatosExcel(rutaExcel, "Hoja2", 1, 3);
-
-  // Ingresar los datos en el formulario
-  driver.findElement(NewUser.getTxtEmployeName()).sendKeys(employeeName);
-
-  // Seleccionar el estado (si es necesario)
-  driver.findElement(NewUser.getLstStatus()).click();
-  WebElement statusOption = driver.findElement(NewUser.getBtnStatus());
-  statusOption.click();
-
-  // Ingresar nombre de usuario y contraseñas
-  driver.findElement(NewUser.getTxtUserName()).sendKeys(userName);
-  driver.findElement(NewUser.getTxtPassword()).sendKeys(password);
-  driver.findElement(NewUser.getTxtPassword2()).sendKeys(confirmPassword);
+  // Verifica si el nombre del usuario existe en la lista
+  return !usuarios.isEmpty();  // Devuelve true si el usuario está en la lista
  }
-
- @Step("Hacer clic en el botón Save")
- public void clickSave() {
-  WebDriver driver = NewUser.getDriver();
-
-  // Esperar explícitamente a que el botón Save esté visible
-  WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-  wait.until(ExpectedConditions.elementToBeClickable(NewUser.getBtnSav()));
-
-  // Hacer clic en el botón Save
-  driver.findElement(NewUser.getBtnSav()).click();
- }
-}
+  }
 

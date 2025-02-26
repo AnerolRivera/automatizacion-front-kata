@@ -1,8 +1,9 @@
-Feature: Login sin credenciales
-  @registroRequired2
+Feature: Login con campos vacíos
+  @registroInvalid2
 
-  Scenario: El usuario no ingresa credenciales
-    Given El usuario entra a la página de login
-    When El usuario no ingresa datos
-    And El usuario da clik el botón
-    Then El sistema debe mostrar los campos "Username" y "Pasword" en rojo y con el texto "Required"
+  Scenario: El usuario deja los campos de nombre de usuario y contraseña vacíos
+    Given El usuario accede en la página de login
+    When El usuario deja los campos de nombre de usuario y contraseña vacíos
+    And El usuario hace clic el en botón login
+    Then El sistema debe mostrar el texto "Required" en el campo Username
+    And El sistema debe mostrar el texto "Required" en el campo Password
