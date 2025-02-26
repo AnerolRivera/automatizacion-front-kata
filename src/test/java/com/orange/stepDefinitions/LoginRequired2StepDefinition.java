@@ -31,23 +31,29 @@ public class LoginRequired2StepDefinition {
     @AfterEach
     void teardown() {driver.quit();
     }
-    @Given("El usuario entra a la página de login")
-    public void elusuarioentraalapáginadelogin() {
+    @Given("El usuario accede a la página de login")
+    public void elusuarioaccedealapáginadelogin() {
         homeStepsReq2.openUrl();
 
     }
-    @When("El usuario no ingresa datos")
-    public void elusuarionoingresadatos() {
-        homeStepsReq2.formulario3();
+    // Paso When: El usuario deja los campos Username y Password vacíos
+    @When("El usuario deja los campos de nombre de usuario y contraseña vacíos")
+    public void elUsuarioDejaCamposVacios() {
+        homeStepsReq2.dejarCamposVacios();  // Llama al método para dejar ambos campos vacíos
+    }
+    @When("El usuario hace clic el en botón login")
+    public void elusuariohaceclicenelbotón() {
+        homeStepsReq2.presionarBotonLogin();
 
     }
-    @When("El usuario da clik el botón")
-    public void elusuariodaclikelbotón() {
-        homeStepsReq2.clickLogin3();
+    @Then("El sistema debe mostrar el texto {string} en el campo Username")
+    public void elSistemaDebeMostrarElTextoEnelCampousername(String string) {
+        homeStepsReq2.verificarMensajeRequiredUserName();
 
     }
-    @Then("El sistema debe mostrar los campos {string} y {string} en rojo y con el texto {string}")
-    public void elsistemadebemostrarloscamposyenrojoyconeltexto(String string, String string2, String string3) {
+    @Then("El sistema debe mostrar el texto {string} en el campo Password")
+    public void elsistemaDebeMostrarElTextoEnElCampopassword(String string) {
+        homeStepsReq2.verificarMensajeRequiredPassword();
 
     }
 
